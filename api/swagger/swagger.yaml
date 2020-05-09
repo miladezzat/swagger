@@ -1,0 +1,254 @@
+swagger: "2.0"
+info:
+  version: "0.0.1"
+  title: PetStore
+# during dev, should point to your local machine
+host: localhost:10010
+# basePath prefixes all resource paths
+basePath: /
+#
+schemes:
+  # tip: remove http to make production-grade
+  - http
+  - https
+# format of bodies a client can send (Content-Type)
+consumes:
+  - application/json
+# format of the responses to the client (Accepts)
+produces:
+  - application/json
+paths:
+  /pet:
+    # our controller name
+    x-swagger-router-controller: pet
+    get:
+      operationId: getAll
+      description: get the pets list
+      # define the type of response for Success "200" and Error
+      responses:
+        "200":
+          description: Success
+          schema:
+            $ref: "#/definitions/GetPetsListResponse"
+        default:
+          description: Error
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+    post:
+      operationId: save
+      description: add a new pet to the list
+      # pet info to be stored
+      parameters:
+        - name: name
+          description: Pet properties
+          in: body
+          required: true
+          schema:
+            $ref: "#/definitions/Pet"
+      responses:
+        "200":
+          description: Success
+          schema:
+            $ref: "#/definitions/GeneralResponse"
+        default:
+          description: Error
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+  /pet/{pet_id}:
+    # our controller name
+    x-swagger-router-controller: pet
+    get:
+      operationId: getOne
+      description: get one pet with bids
+      # define the type of response for Success "200" and Error
+      parameters:
+        - name: pet_id
+          type: string
+          in: path
+          required: true
+      responses:
+        "200":
+          description: Success
+          schema:
+            $ref: "#/definitions/GetPetResponse"
+        default:
+          description: Error
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+  /pet/bid/{pet_id}:
+    # our controller name
+    x-swagger-router-controller: pet
+    put:
+      operationId: bidPet
+      description: Bid a pet
+      # define the parameters
+      parameters:
+        - name: pet_id
+          description: Pet id
+          type: string
+          in: path
+          required: true
+        - name: user_name
+          description: Bid properties
+          in: body
+          required: true
+          schema:
+            $ref: "#/definitions/Bid"
+      responses:
+        "200":
+          description: Success
+          schema:
+            $ref: "#/definitions/GeneralResponse"
+        default:
+          description: Error
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+  /pet/winner/{pet_id}:
+    x-swagger-router-controller: pet
+    get:
+      operationId: bidWinner
+      description: display winners of bid
+      # define the parameters
+      parameters:
+        - name: pet_id
+          description: Pet id
+          type: string
+          in: path
+          required: true
+      responses:
+        "200":
+          description: Success
+          schema:
+            $ref: "#/definitions/BidWinners"
+        default:
+          description: Error
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+  /swagger:
+    x-swagger-pipe: swagger_raw
+# complex objects have schema definitions
+definitions:
+  # GET /pet successful response
+  GetPetsListResponse:
+    required:
+      - pets
+    properties:
+      # The array of pets
+      pets:
+        type: array
+        items:
+          type: object
+          properties:
+            id:
+              type: string
+            name:
+              type: string
+            num_avalible:
+              type: number
+            owner:
+              type: object
+              properties:
+                id:
+                  type: string
+                name:
+                  type: string
+            bids:
+              type: array
+              items:
+                type: object
+                properties:
+                  user_id:
+                    type: string
+                  user_name:
+                    type: string
+                  amount_money:
+                    type: number
+
+  Pet:
+    type: object
+    properties:
+      name:
+        type: string
+        description: task object name
+      num_avalible:
+        type: number
+        description: number of avalible items of pet
+      owner:
+        type: object
+        description: task object owner
+        properties:
+          id:
+            type: string
+            description: task object owner id
+          name:
+            type: string
+            description: task object owner name
+    required:
+      - name
+      - owner
+  GetPetResponse:
+    required:
+      - id
+      - name
+      - owner
+    properties:
+      id:
+        type: string
+      name:
+        type: string
+      num_avalible:
+        type: number
+      owner:
+        type: object
+        properties:
+          id:
+            type: string
+            description: task object owner id
+          name:
+            type: string
+            description: task object owner name
+      bids:
+        type: array
+        items:
+          type: object
+          properties:
+            user_id:
+              type: string
+            user_name:
+              type: string
+            amount_money:
+              type: number
+  Bid:
+    type: object
+    properties:
+      user_id:
+        type: string
+      user_name:
+        type: string
+      amount_money:
+        type: number
+  GeneralResponse:
+    type: object
+    properties:
+      success:
+        type: number
+        description: returns 1 if successful
+      description:
+        type: string
+        description: a short comment
+    required:
+      - success
+      - description
+  BidWinners:
+    type: object
+    properties:
+      user: 
+        type: string
+      bid:
+        type: string
+  ErrorResponse:
+    required:
+      - message
+    properties:
+      message:
+        type: string
