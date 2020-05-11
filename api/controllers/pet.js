@@ -5,13 +5,12 @@ var db = require('../../config/db')();
 
 //GET /pet operationId
 function getAll(req, res, next) {
-    res.json({ pets: db.find() });
+    res.status(200).json({ pets: db.find() });
 }
 
 //POST /pet operationId
-function save(req, res, next) {
-    console.log(req.body);
-    res.json({ success: db.save(req.body), description: "Pet added to the list!" });
+function save(req, res, next) {    
+    res.status(201).json({ pet: db.save(req.body), description: "Pet added to the list!" });
 }
 
 function bidPet(req, res, next) {
@@ -69,10 +68,10 @@ function bidWinner(req, res, next) {
 
             console.log(winners);
             
-            for (let index = pet.num_avalible-1 ; index < sortedBids.length; index++) {
+            for (let index = pet.num_avalible ; index < sortedBids.length; index++) {
                 winners.push({
                     user: sortedBids[index].user_name,
-                    paind: "Lost the auction"
+                    pid: "Lost the auction"
                 })
             }
 

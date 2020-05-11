@@ -11,7 +11,7 @@ module.exports = function () {
         save(pet = {}) {
             pet.id = uuidv4(); // fast enough for our purpose
             this.petsList.push(pet);
-            return 1;
+            return pet;
         },
         /*
          * Retrieve a pet with a given id or return all the pets if the id is undefined.
